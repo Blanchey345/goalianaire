@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOALIANAIRE — The Daily Penalty Shootout</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #0b2f24 0%, #061816 55%, #030a0c 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(8, 24, 24, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(52, 211, 153, 0.18);
+      box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
+    }
+    .tier-10 { background: rgba(100, 116, 139, 0.22); border-color: rgba(148, 163, 184, 0.45); color: #cbd5e1; }
+    .tier-30 { background: rgba(14, 165, 233, 0.18); border-color: rgba(56, 189, 248, 0.5); color: #7dd3fc; }
+    .tier-55 { background: rgba(139, 92, 246, 0.2); border-color: rgba(167, 139, 250, 0.55); color: #c4b5fd; }
+    .tier-80 { background: rgba(245, 158, 11, 0.2); border-color: rgba(251, 191, 36, 0.55); color: #fcd34d; }
+    .tier-80 { background: rgba(244, 63, 94, 0.22); border-color: rgba(251, 113, 133, 0.6); color: #fda4af; }
+    .tier-100 {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(250, 204, 21, 0.26));
+      border-color: rgba(52, 211, 153, 0.9);
+      color: #6ee7b7;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.28);
+    }
+    .tier-0 { background: rgba(239, 68, 68, 0.14); border-color: rgba(248, 113, 113, 0.4); color: #fca5a5; }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.38); }
+      50% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+    }
+    .pulse-emerald {
+      animation: pulseGlow 2.2s infinite;
+    }
+    .catch-scroll::-webkit-scrollbar { width: 6px; }
+    .catch-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); border-radius: 999px; }
+    .catch-scroll::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.3); border-radius: 999px; }
+  </style>
+</head>
+<body class="antialiased selection:bg-emerald-500/30 selection:text-emerald-100">
+  <div id="app" class="max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-6 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="flex items-center justify-between gap-2 pb-4 border-b border-emerald-500/15">
+      <button id="brandBtn" type="button" class="flex items-center gap-2.5 text-left group focus:outline-none">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-400 to-amber-300 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <polygon points="12 7 15.5 9.8 14.2 14 9.8 14 8.5 9.8"/>
+            <path d="M12 3v4M15.5 9.8l4.5-1.3M14.2 14l2.8 4.2M9.8 14L7 18.2M8.5 9.8L4 8.5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-lg sm:text-xl font-black tracking-tight text-white">GOALIANAIRE</span>
+            <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/25">Penalty Shootout</span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-slate-400 leading-tight">Rarer answers hit Top Bins. Obvious ones scrape down the middle.</p>
+        </div>
+      </button>
+
+      <div class="flex items-center gap-2">
+        <button id="howToBtn" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/70 hover:bg-slate-700/80 border border-slate-700/80 transition">
+          Rules
+        </button>
+        <button id="muteBtn" type="button" aria-label="Toggle sound" class="p-2 rounded-lg text-slate-300 hover:text-white bg-slate-800/70 hover:bg-slate-700/80 border border-slate-700/80 transition" title="Toggle Sound">
+          <svg id="soundOnIcon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+          <svg id="soundOffIcon" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 pt-4 sm:pt-5">
+      <!-- Primary Game Area -->
+      <section class="lg:col-span-7 flex flex-col">
+        <!-- HOME VIEW -->
+        <div id="homeView" class="glass-card rounded-2xl p-5 sm:p-7 flex flex-col gap-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-semibold mb-2">
+                <span>⚽</span> 7 Penalties · 25s Each · Max 700 pts
+              </div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Step up to the spot. Aim for Top Bins.</h1>
+              <p class="text-sm text-slate-300 mt-1.5 leading-relaxed">
+                Every valid answer scores a penalty—the rarer the pick, the cleaner the finish. Obvious picks like <span class="text-slate-200 font-semibold">Real Madrid</span> or <span class="text-slate-200 font-semibold">Brazil</span> go <span class="text-slate-200 font-semibold">Down the Middle (+10 pts)</span>. Deep cuts like <span class="text-emerald-300 font-semibold">Steaua București</span> or <span class="text-emerald-300 font-semibold">Just Fontaine</span> rocket into <span class="text-emerald-300 font-semibold">Top Bins (+100 pts)</span>!
+              </p>
+            </div>
+          </div>
+
+          <!-- Daily Shootout Card -->
+          <div class="rounded-xl bg-gradient-to-br from-emerald-950/60 via-slate-900/80 to-teal-950/50 border border-emerald-400/30 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Daily Shootout</span>
+                <span id="dailyDateLabel" class="text-xs text-slate-400 font-mono-num"></span>
+                <span id="dailyCompletedBadge" class="hidden text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Completed</span>
+              </div>
+              <p class="text-sm text-slate-200 mt-1">Same 7 World Cup, UCL &amp; Euros prompts for everyone today.</p>
+              <div class="flex items-center gap-4 mt-2.5 text-xs text-slate-400">
+                <span>Streak: <strong id="streakVal" class="text-white font-mono-num">0</strong></span>
+                <span>Best Score: <strong id="bestScoreVal" class="text-emerald-300 font-mono-num">0 pts</strong></span>
+              </div>
+            </div>
+            <button id="startDailyBtn" type="button" class="shrink-0 px-5 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950 hover:brightness-110 active:scale-[0.98] transition shadow-lg shadow-emerald-500/20 pulse-emerald">
+              Start Daily Shootout
+            </button>
+          </div>
+
+          <!-- Shot Quality Legend -->
+          <div class="pt-2 border-t border-slate-800">
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Shot Zones &amp; Points</div>
+            <div class="flex flex-wrap gap-1.5 text-[11px] font-semibold">
+              <span class="px-2 py-0.5 rounded-md border tier-10">Down the Middle · 10</span>
+              <span class="px-2 py-0.5 rounded-md border tier-30">Low Corner · 30</span>
+              <span class="px-2 py-0.5 rounded-md border tier-55">Side Netting · 55</span>
+              <span class="px-2 py-0.5 rounded-md border tier-80"></span>
+              <span class="px-2 py-0.5 rounded-md border tier-80">Off the Bar &amp; In · 80</span>
+              <span class="px-2 py-0.5 rounded-md border tier-100">Top Bins! · 100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PLAYING VIEW -->
+        <div id="playView" class="hidden glass-card rounded-2xl p-5 sm:p-7 flex flex-col gap-5">
+          <!-- Top Meta Bar -->
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span id="modeBadge" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-400/25">Daily Shootout</span>
+              <span id="progressBadge" class="text-xs font-mono-num font-bold text-slate-300">Kick 1 / 7</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="timerText" class="text-sm font-mono-num font-bold text-emerald-300">25.0s</span>
+            </div>
+          </div>
+
+          <!-- Timer Bar -->
+          <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+            <div id="timerBar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-300 transition-none" style="width: 100%"></div>
+          </div>
+
+          <!-- Prompt Dots -->
+          <div id="promptDots" class="flex items-center gap-1.5"></div>
+
+          <!-- Prompt Question -->
+          <div class="py-2">
+            <div id="categoryTag" class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-1.5">FIFA World Cup</div>
+            <h2 id="promptQuestion" class="text-xl sm:text-2xl font-extrabold text-white leading-snug"></h2>
+            <p id="promptHint" class="text-xs text-slate-400 mt-1.5"></p>
+          </div>
+
+          <!-- Answer Form -->
+          <form id="answerForm" class="flex flex-col sm:flex-row gap-2.5" autocomplete="off">
+            <input
+              id="answerInput"
+              type="text"
+              placeholder="Type your rarest valid answer..."
+              class="flex-1 px-4 py-3.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/25 outline-none text-white placeholder-slate-500 text-base font-medium transition"
+            />
+            <div class="flex gap-2">
+              <button id="submitBtn" type="submit" class="flex-1 sm:flex-none px-6 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950 hover:brightness-110 active:scale-[0.98] transition">
+                Shoot!
+              </button>
+              <button id="skipBtn" type="button" class="px-4 py-3.5 rounded-xl font-semibold text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                Skip
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- REVEAL / THE CATCH VIEW -->
+        <div id="revealView" class="hidden glass-card rounded-2xl p-5 sm:p-7 flex flex-col gap-5">
+          <div class="flex items-center justify-between gap-2">
+            <span id="revealProgress" class="text-xs font-mono-num font-bold text-slate-400">Kick 1 / 7</span>
+            <span id="revealScorePill" class="text-xs font-mono-num font-bold px-2.5 py-1 rounded-full bg-slate-800 text-emerald-300 border border-slate-700">Score: 0 pts</span>
+          </div>
+
+          <!-- Player Outcome Banner -->
+          <div id="outcomeBanner" class="rounded-xl p-4 border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="outcomeTierBadge" class="text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md border"></span>
+                <span id="outcomeStatusText" class="text-xs text-slate-300 font-medium"></span>
+              </div>
+              <div id="outcomeAnswer" class="text-lg sm:text-xl font-extrabold text-white mt-1.5"></div>
+            </div>
+            <div class="text-left sm:text-right shrink-0">
+              <div id="outcomePoints" class="text-2xl font-black font-mono-num"></div>
+              <div id="outcomeSub" class="text-xs text-slate-400"></div>
+            </div>
+          </div>
+
+          <!-- Accepted Answers Breakdown -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Scouting Report — Valid Answers &amp; Shot Zones</h3>
+              <span id="catchCount" class="text-xs text-slate-400 font-mono-num"></span>
+            </div>
+            <div id="catchList" class="catch-scroll max-h-60 overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+          </div>
+
+          <div class="flex justify-end pt-1">
+            <button id="nextPromptBtn" type="button" class="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950 hover:brightness-110 active:scale-[0.98] transition">
+              Next Kick →
+            </button>
+          </div>
+        </div>
+
+        <!-- SUMMARY VIEW -->
+        <div id="summaryView" class="hidden glass-card rounded-2xl p-5 sm:p-7 flex flex-col gap-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+            <div>
+              <div id="summaryModeLabel" class="text-xs font-bold uppercase tracking-widest text-emerald-300">Daily Shootout Complete</div>
+              <h2 class="text-2xl sm:text-3xl font-black text-white mt-1">
+                <span id="summaryScore" class="font-mono-num text-emerald-300">0</span>
+                <span class="text-base font-semibold text-slate-400">/ 700 pts</span>
+              </h2>
+              <p id="summaryRank" class="text-sm font-semibold text-amber-300 mt-1"></p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button id="shareBtn" type="button" class="px-4 py-2.5 rounded-xl font-bold text-sm bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 transition">
+                Share Result
+              </button>
+              <button id="homeBtn" type="button" class="px-4 py-2.5 rounded-xl font-semibold text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                Menu
+              </button>
+            </div>
+          </div>
+
+          <div id="summaryList" class="flex flex-col gap-2"></div>
+        </div>
+      </section>
+
+      <!-- Penalty Kick Stadium Sidebar -->
+      <aside class="lg:col-span-5 glass-card rounded-2xl p-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Shootout Score</div>
+            <div class="text-xl font-black font-mono-num text-white"><span id="scoreReadout">0</span><span class="text-sm text-emerald-300"> / 700 pts</span></div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Last Shot</div>
+            <div id="lastShotReadout" class="text-xs font-bold text-emerald-300">On the Spot</div>
+          </div>
+        </div>
+        <div class="relative w-full h-64 sm:h-72 lg:h-[380px] rounded-xl overflow-hidden border border-emerald-500/25 bg-slate-950">
+          <canvas id="pitchCanvas" class="w-full h-full block"></canvas>
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+          <span>Goals Scored: <strong id="goalsCountReadout" class="text-white font-mono-num">0 / 7</strong></span>
+          <span id="shotBannerHint" class="text-emerald-300/90 font-medium">Type &amp; Shoot to take your kick</span>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Rules Modal -->
+  <div id="rulesModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-md w-full p-5 sm:p-6 flex flex-col gap-4 border border-emerald-400/30">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-extrabold text-white">How to Play Goalianaire</h3>
+        <button id="closeRulesBtn" type="button" class="text-slate-400 hover:text-white text-xl leading-none px-2">&times;</button>
+      </div>
+      <ul class="text-sm text-slate-300 space-y-2.5 list-disc pl-5">
+        <li>Each shootout has <strong>7 open-ended football prompts</strong> covering the World Cup, UEFA Champions League, Euros, and Ballon d'Or.</li>
+        <li>You have <strong>25 seconds</strong> per kick to type any factually valid answer.</li>
+        <li><strong>Better answers hit cleaner spots:</strong> obvious picks go <em>Down the Middle (10 pts)</em>, while rare gems hit <em>Panenka (65 pts)</em>, <em>Off the Bar &amp; In (85 pts)</em>, or <em>Top Bins (100 pts)</em>.</li>
+        <li>Wrong answers or timeouts are <strong>Saved by the Keeper (0 pts)</strong>. Max score is <strong>700 pts</strong>!</li>
+        <li>Minor typos and common abbreviations (like <em>PSG</em>, <em>Man Utd</em>, <em>USA</em>) are accepted automatically.</li>
+      </ul>
+      <button id="gotItBtn" type="button" class="w-full py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950">
+        Step Up to the Spot
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-900 border border-emerald-400/40 text-emerald-200 text-xs font-semibold shadow-xl"></div>
+
+  <script>
+    // =========================================================================
+    // 1. VERIFIED SOCCER TRIVIA PROMPT BANK & GOAL TIERS
+    // =========================================================================
+    const TIER_META = {
+      0:   { label: 'Saved!',          pts: 0,   cls: 'tier-0',   emoji: '🧤', desc: 'Keeper got a hand to it' },
+      10:  { label: 'Down the Middle', pts: 10,  cls: 'tier-10',  emoji: '⚪', desc: 'Squeaked past the keeper' },
+      30:  { label: 'Low Corner',      pts: 30,  cls: 'tier-30',  emoji: '🔵', desc: 'Tucked inside the bottom post' },
+      55:  { label: 'Side Netting',    pts: 55,  cls: 'tier-55',  emoji: '🟣', desc: 'Whipped past the fingertips' },
+      
+      80:  { label: 'Off the Bar & In',pts: 80,  cls: 'tier-80',  emoji: '🟠', desc: 'Thunderbolt off the woodwork' },
+      100: { label: 'Top Bins!',       pts: 100, cls: 'tier-100', emoji: '🥅', desc: 'Unstoppable Goalianaire strike' }
+    };
+
+    const PROMPTS = [
+      {
+        id: 'wc_winners',
+        pack: 'worldcup',
+        category: 'FIFA World Cup',
+        question: 'Name a country that has won the men\'s FIFA World Cup (1930–2026).',
+        hint: '8 nations have lifted the trophy, including 2026 champions Spain.',
+        answers: [
+          { name: 'Brazil', tier: 10, crowd: 42, aliases: ['brasil'] },
+          { name: 'Argentina', tier: 10, crowd: 24, aliases: [] },
+          { name: 'France', tier: 30, crowd: 11, aliases: [] },
+          { name: 'Germany', tier: 30, crowd: 9, aliases: ['west germany', 'deutschland'] },
+          { name: 'Spain', tier: 55, crowd: 6, aliases: ['espana'] },
+          { name: 'Italy', tier: 55, crowd: 4, aliases: ['italia'] },
+          { name: 'England', tier: 80, crowd: 3, aliases: ['uk'] },
+          { name: 'Uruguay', tier: 100, crowd: 1, aliases: [] }
+        ]
+      },
+      {
+        id: 'wc_runners_up',
+        pack: 'worldcup',
+        category: 'FIFA World Cup',
+        question: 'Name a country that has finished as Runner-Up in a men\'s FIFA World Cup.',
+        hint: '10 nations have lost a World Cup final (or finished 2nd in 1950).',
+        answers: [
+          { name: 'Argentina', tier: 10, crowd: 28, aliases: [] },
+          { name: 'France', tier: 10, crowd: 22, aliases: [] },
+          { name: 'Netherlands', tier: 30, crowd: 16, aliases: ['holland', 'the netherlands'] },
+          { name: 'Germany', tier: 30, crowd: 10, aliases: ['west germany'] },
+          { name: 'Croatia', tier: 55, crowd: 8, aliases: [] },
+          { name: 'Brazil', tier: 55, crowd: 6, aliases: ['brasil'] },
+          { name: 'Italy', tier: 80, crowd: 4, aliases: [] },
+          { name: 'Sweden', tier: 80, crowd: 2, aliases: [] },
+          { name: 'Hungary', tier: 100, crowd: 2, aliases: [] },
+          { name: 'Czechoslovakia', tier: 100, crowd: 2, aliases: [] }
+        ]
+      },
+      {
+        id: 'wc_hosts',
+        pack: 'worldcup',
+        category: 'FIFA World Cup',
+        question: 'Name a country that has hosted (or co-hosted) the men\'s FIFA World Cup.',
+        hint: 'Includes 2026 co-hosts USA, Mexico, and Canada.',
+        answers: [
+          { name: 'United States', tier: 10, crowd: 20, aliases: ['usa', 'us', 'america', 'united states of america'] },
+          { name: 'Qatar', tier: 10, crowd: 16, aliases: [] },
+          { name: 'Brazil', tier: 10, crowd: 14, aliases: ['brasil'] },
+          { name: 'Mexico', tier: 30, crowd: 10, aliases: [] },
+          { name: 'Russia', tier: 30, crowd: 7, aliases: [] },
+          { name: 'Germany', tier: 30, crowd: 6, aliases: ['west germany'] },
+          { name: 'France', tier: 55, crowd: 5, aliases: [] },
+          { name: 'England', tier: 55, crowd: 4, aliases: [] },
+          { name: 'Canada', tier: 55, crowd: 4, aliases: [] },
+          { name: 'South Africa', tier: 55, crowd: 3, aliases: [] },
+          { name: 'Italy', tier: 80, crowd: 2, aliases: [] },
+          { name: 'Spain', tier: 80, crowd: 2, aliases: [] },
+          { name: 'Argentina', tier: 80, crowd: 2, aliases: [] },
+          { name: 'Japan', tier: 80, crowd: 1.5, aliases: [] },
+          { name: 'South Korea', tier: 80, crowd: 1.5, aliases: ['korea republic', 'korea'] },
+          { name: 'Uruguay', tier: 80, crowd: 1, aliases: [] },
+          { name: 'Sweden', tier: 80, crowd: 0.5, aliases: [] },
+          { name: 'Switzerland', tier: 100, crowd: 0.3, aliases: [] },
+          { name: 'Chile', tier: 100, crowd: 0.2, aliases: [] }
+        ]
+      },
+      {
+        id: 'wc_semi_never_won',
+        pack: 'worldcup',
+        category: 'FIFA World Cup',
+        question: 'Name a country that reached a World Cup Semi-Final (Top 4) without ever winning the title.',
+        hint: 'Think of 2022 Cinderella Morocco, 2002 co-hosts, or European near-misses.',
+        answers: [
+          { name: 'Netherlands', tier: 10, crowd: 26, aliases: ['holland', 'the netherlands'] },
+          { name: 'Croatia', tier: 10, crowd: 22, aliases: [] },
+          { name: 'Morocco', tier: 30, crowd: 14, aliases: [] },
+          { name: 'Belgium', tier: 30, crowd: 10, aliases: [] },
+          { name: 'Portugal', tier: 55, crowd: 8, aliases: [] },
+          { name: 'Sweden', tier: 55, crowd: 4, aliases: [] },
+          { name: 'South Korea', tier: 80, crowd: 3, aliases: ['korea republic', 'korea'] },
+          { name: 'Turkey', tier: 80, crowd: 2.5, aliases: ['turkiye'] },
+          { name: 'Poland', tier: 80, crowd: 2, aliases: [] },
+          { name: 'United States', tier: 80, crowd: 2, aliases: ['usa', 'us'] },
+          { name: 'Hungary', tier: 80, crowd: 1.5, aliases: [] },
+          { name: 'Czechoslovakia', tier: 80, crowd: 1, aliases: [] },
+          { name: 'Austria', tier: 100, crowd: 1, aliases: [] },
+          { name: 'Bulgaria', tier: 100, crowd: 1, aliases: [] },
+          { name: 'Chile', tier: 100, crowd: 0.8, aliases: [] },
+          { name: 'Soviet Union', tier: 100, crowd: 0.6, aliases: ['ussr'] },
+          { name: 'Yugoslavia', tier: 100, crowd: 0.6, aliases: [] }
+        ]
+      },
+      {
+        id: 'wc_golden_boot',
+        pack: 'worldcup',
+        category: 'FIFA World Cup',
+        question: 'Name a player who won the FIFA World Cup Golden Boot (Top Scorer).',
+        hint: 'From Guillermo Stábile (1930) to Kylian Mbappé (2022 & 2026).',
+        answers: [
+          { name: 'Kylian Mbappé', tier: 10, crowd: 34, aliases: ['mbappe', 'kylian mbappe'] },
+          { name: 'Harry Kane', tier: 10, crowd: 18, aliases: ['kane'] },
+          { name: 'Ronaldo', tier: 30, crowd: 12, aliases: ['ronaldo nazario', 'r9'] },
+          { name: 'Miroslav Klose', tier: 30, crowd: 9, aliases: ['klose'] },
+          { name: 'James Rodríguez', tier: 30, crowd: 7, aliases: ['james', 'james rodriguez'] },
+          { name: 'Thomas Müller', tier: 55, crowd: 5, aliases: ['muller', 'thomas muller'] },
+          { name: 'Gerd Müller', tier: 55, crowd: 3, aliases: ['gerd muller'] },
+          { name: 'Eusébio', tier: 80, crowd: 2, aliases: ['eusebio'] },
+          { name: 'Just Fontaine', tier: 80, crowd: 2, aliases: ['fontaine'] },
+          { name: 'Gary Lineker', tier: 80, crowd: 1.5, aliases: ['lineker'] },
+          { name: 'Paolo Rossi', tier: 80, crowd: 1.5, aliases: ['rossi'] },
+          { name: 'Mario Kempes', tier: 80, crowd: 1, aliases: ['kempes'] },
+          { name: 'Davor Šuker', tier: 80, crowd: 1, aliases: ['suker', 'davor suker'] },
+          { name: 'Hristo Stoichkov', tier: 80, crowd: 0.8, aliases: ['stoichkov'] },
+          { name: 'Oleg Salenko', tier: 80, crowd: 0.6, aliases: ['salenko'] },
+          { name: 'Salvatore Schillaci', tier: 80, crowd: 0.5, aliases: ['schillaci', 'toto schillaci'] },
+          { name: 'Garrincha', tier: 80, crowd: 0.4, aliases: [] },
+          { name: 'Vavá', tier: 100, crowd: 0.2, aliases: ['vava'] },
+          { name: 'Grzegorz Lato', tier: 100, crowd: 0.2, aliases: ['lato'] },
+          { name: 'Sándor Kocsis', tier: 100, crowd: 0.2, aliases: ['kocsis', 'sandor kocsis'] },
+          { name: 'Guillermo Stábile', tier: 100, crowd: 0.1, aliases: ['stabile', 'guillermo stabile'] },
+          { name: 'Oldřich Nejedlý', tier: 100, crowd: 0.1, aliases: ['nejedly', 'oldrich nejedly'] },
+          { name: 'Leônidas', tier: 100, crowd: 0.1, aliases: ['leonidas', 'leonidas da silva'] },
+          { name: 'Ademir', tier: 100, crowd: 0.1, aliases: [] },
+          { name: 'Flórián Albert', tier: 100, crowd: 0.1, aliases: ['albert', 'florian albert'] },
+          { name: 'Valentin Ivanov', tier: 100, crowd: 0.1, aliases: ['ivanov'] },
+          { name: 'Dražan Jerković', tier: 100, crowd: 0.1, aliases: ['jerkovic', 'drazan jerkovic'] },
+          { name: 'Leonel Sánchez', tier: 100, crowd: 0.1, aliases: ['leonel sanchez', 'sanchez'] }
+        ]
+      },
+      {
+        id: 'wc_host_winners',
+        pack: 'worldcup',
+        category: 'FIFA World Cup',
+        question: 'Name a country that won the FIFA World Cup on home soil (as Host Nation).',
+        hint: 'Only 6 nations have ever pulled this off.',
+        answers: [
+          { name: 'France', tier: 10, crowd: 34, aliases: [] },
+          { name: 'England', tier: 10, crowd: 26, aliases: [] },
+          { name: 'Argentina', tier: 30, crowd: 16, aliases: [] },
+          { name: 'Germany', tier: 55, crowd: 11, aliases: ['west germany'] },
+          { name: 'Italy', tier: 80, crowd: 8, aliases: [] },
+          { name: 'Uruguay', tier: 100, crowd: 5, aliases: [] }
+        ]
+      },
+      {
+        id: 'wc_21st_hosts',
+        pack: 'worldcup',
+        category: 'FIFA World Cup',
+        question: 'Name a country that hosted a FIFA World Cup in the 21st Century (2002–2026).',
+        hint: '10 nations across 7 tournaments.',
+        answers: [
+          { name: 'Qatar', tier: 10, crowd: 24, aliases: [] },
+          { name: 'United States', tier: 10, crowd: 19, aliases: ['usa', 'us', 'america'] },
+          { name: 'Brazil', tier: 30, crowd: 14, aliases: ['brasil'] },
+          { name: 'Russia', tier: 30, crowd: 10, aliases: [] },
+          { name: 'Germany', tier: 55, crowd: 8, aliases: [] },
+          { name: 'South Africa', tier: 55, crowd: 7, aliases: [] },
+          { name: 'Mexico', tier: 80, crowd: 6, aliases: [] },
+          { name: 'Canada', tier: 80, crowd: 5, aliases: [] },
+          { name: 'Japan', tier: 80, crowd: 4, aliases: [] },
+          { name: 'South Korea', tier: 100, crowd: 3, aliases: ['korea republic', 'korea'] }
+        ]
+      },
+      {
+        id: 'ucl_winners',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a club that has won the UEFA Champions League / European Cup.',
+        hint: '24 clubs have lifted "Big Ears", including back-to-back winners PSG (2025, 2026).',
+        answers: [
+          { name: 'Real Madrid', tier: 10, crowd: 30, aliases: ['real', 'madrid', 'rma'] },
+          { name: 'Barcelona', tier: 10, crowd: 16, aliases: ['barca', 'fc barcelona'] },
+          { name: 'Bayern Munich', tier: 10, crowd: 12, aliases: ['bayern', 'fc bayern'] },
+          { name: 'Liverpool', tier: 30, crowd: 9, aliases: ['lfc'] },
+          { name: 'AC Milan', tier: 30, crowd: 7, aliases: ['milan'] },
+          { name: 'Manchester United', tier: 30, crowd: 6, aliases: ['man utd', 'man united', 'manchester utd', 'mufc'] },
+          { name: 'Chelsea', tier: 30, crowd: 4, aliases: [] },
+          { name: 'Paris Saint-Germain', tier: 55, crowd: 3.5, aliases: ['psg', 'paris', 'paris sg'] },
+          { name: 'Manchester City', tier: 55, crowd: 3, aliases: ['man city', 'mcfc'] },
+          { name: 'Inter Milan', tier: 55, crowd: 2.5, aliases: ['inter', 'internazionale'] },
+          { name: 'Juventus', tier: 55, crowd: 2, aliases: ['juve'] },
+          { name: 'Ajax', tier: 80, crowd: 1.5, aliases: ['afc ajax'] },
+          { name: 'Borussia Dortmund', tier: 80, crowd: 1, aliases: ['dortmund', 'bvb'] },
+          { name: 'Porto', tier: 80, crowd: 0.7, aliases: ['fc porto'] },
+          { name: 'Benfica', tier: 80, crowd: 0.5, aliases: [] },
+          { name: 'Nottingham Forest', tier: 80, crowd: 0.4, aliases: ['forest'] },
+          { name: 'Celtic', tier: 80, crowd: 0.3, aliases: [] },
+          { name: 'Aston Villa', tier: 80, crowd: 0.2, aliases: ['villa'] },
+          { name: 'Marseille', tier: 80, crowd: 0.2, aliases: ['om', 'olympique marseille'] },
+          { name: 'PSV Eindhoven', tier: 80, crowd: 0.1, aliases: ['psv'] },
+          { name: 'Feyenoord', tier: 100, crowd: 0.1, aliases: [] },
+          { name: 'Hamburger SV', tier: 100, crowd: 0.1, aliases: ['hamburg', 'hsv'] },
+          { name: 'Steaua București', tier: 100, crowd: 0.1, aliases: ['steaua', 'steaua bucharest', 'fcsb'] },
+          { name: 'Red Star Belgrade', tier: 100, crowd: 0.1, aliases: ['red star', 'crvena zvezda'] }
+        ]
+      },
+      {
+        id: 'ucl_runners_up_only',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a club that reached a UCL / European Cup Final without EVER winning it.',
+        hint: '18 clubs, including 2026 finalists Arsenal and 3-time runners-up Atlético Madrid.',
+        answers: [
+          { name: 'Arsenal', tier: 10, crowd: 28, aliases: [] },
+          { name: 'Atlético Madrid', tier: 10, crowd: 24, aliases: ['atletico', 'atleti', 'atletico de madrid'] },
+          { name: 'Tottenham Hotspur', tier: 30, crowd: 14, aliases: ['tottenham', 'spurs'] },
+          { name: 'Valencia', tier: 55, crowd: 8, aliases: [] },
+          { name: 'Roma', tier: 55, crowd: 6, aliases: ['as roma'] },
+          { name: 'Bayer Leverkusen', tier: 55, crowd: 5, aliases: ['leverkusen'] },
+          { name: 'Monaco', tier: 80, crowd: 4, aliases: ['as monaco'] },
+          { name: 'Leeds United', tier: 80, crowd: 3, aliases: ['leeds'] },
+          { name: 'Eintracht Frankfurt', tier: 80, crowd: 2, aliases: ['frankfurt'] },
+          { name: 'Fiorentina', tier: 80, crowd: 1.5, aliases: [] },
+          { name: 'Borussia Mönchengladbach', tier: 80, crowd: 1, aliases: ['monchengladbach', 'gladbach'] },
+          { name: 'Sampdoria', tier: 80, crowd: 1, aliases: [] },
+          { name: 'Reims', tier: 100, crowd: 0.5, aliases: ['stade de reims'] },
+          { name: 'Saint-Étienne', tier: 100, crowd: 0.5, aliases: ['saint etienne', 'st etienne'] },
+          { name: 'Club Brugge', tier: 100, crowd: 0.5, aliases: ['brugge'] },
+          { name: 'Panathinaikos', tier: 100, crowd: 0.4, aliases: [] },
+          { name: 'Malmö FF', tier: 100, crowd: 0.3, aliases: ['malmo'] },
+          { name: 'Partizan', tier: 100, crowd: 0.3, aliases: ['partizan belgrade'] }
+        ]
+      },
+      {
+        id: 'ucl_3_plus',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a club that has won the UCL / European Cup 3 or more times.',
+        hint: '8 European giants.',
+        answers: [
+          { name: 'Real Madrid', tier: 10, crowd: 34, aliases: ['real', 'madrid'] },
+          { name: 'Barcelona', tier: 10, crowd: 20, aliases: ['barca'] },
+          { name: 'Bayern Munich', tier: 30, crowd: 14, aliases: ['bayern'] },
+          { name: 'Liverpool', tier: 30, crowd: 11, aliases: [] },
+          { name: 'AC Milan', tier: 55, crowd: 9, aliases: ['milan'] },
+          { name: 'Manchester United', tier: 80, crowd: 6, aliases: ['man utd', 'man united'] },
+          { name: 'Ajax', tier: 80, crowd: 4, aliases: [] },
+          { name: 'Inter Milan', tier: 100, crowd: 2, aliases: ['inter'] }
+        ]
+      },
+      {
+        id: 'ucl_one_time',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a club that has won the UCL / European Cup exactly ONCE.',
+        hint: '10 clubs, from Celtic (1967) to Man City (2023).',
+        answers: [
+          { name: 'Manchester City', tier: 10, crowd: 36, aliases: ['man city', 'city'] },
+          { name: 'Borussia Dortmund', tier: 30, crowd: 24, aliases: ['dortmund', 'bvb'] },
+          { name: 'Celtic', tier: 55, crowd: 14, aliases: [] },
+          { name: 'Aston Villa', tier: 55, crowd: 10, aliases: ['villa'] },
+          { name: 'Marseille', tier: 80, crowd: 6, aliases: ['om'] },
+          { name: 'PSV Eindhoven', tier: 80, crowd: 4, aliases: ['psv'] },
+          { name: 'Feyenoord', tier: 80, crowd: 2.5, aliases: [] },
+          { name: 'Hamburger SV', tier: 80, crowd: 1.5, aliases: ['hamburg', 'hsv'] },
+          { name: 'Steaua București', tier: 100, crowd: 1, aliases: ['steaua', 'steaua bucharest', 'fcsb'] },
+          { name: 'Red Star Belgrade', tier: 100, crowd: 1, aliases: ['red star', 'crvena zvezda'] }
+        ]
+      },
+      {
+        id: 'ucl_cities',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a city that has hosted a UCL / European Cup Final.',
+        hint: '26 European host cities, including 2026 host Budapest.',
+        answers: [
+          { name: 'London', tier: 10, crowd: 24, aliases: [] },
+          { name: 'Madrid', tier: 10, crowd: 16, aliases: [] },
+          { name: 'Paris', tier: 30, crowd: 12, aliases: ['saint-denis', 'saint denis'] },
+          { name: 'Munich', tier: 30, crowd: 9, aliases: ['munchen'] },
+          { name: 'Istanbul', tier: 30, crowd: 8, aliases: [] },
+          { name: 'Milan', tier: 55, crowd: 6, aliases: ['milano'] },
+          { name: 'Rome', tier: 55, crowd: 5, aliases: ['roma'] },
+          { name: 'Lisbon', tier: 55, crowd: 4, aliases: ['lisboa'] },
+          { name: 'Budapest', tier: 55, crowd: 3, aliases: [] },
+          { name: 'Athens', tier: 80, crowd: 2, aliases: [] },
+          { name: 'Barcelona', tier: 80, crowd: 2, aliases: [] },
+          { name: 'Berlin', tier: 80, crowd: 1.5, aliases: [] },
+          { name: 'Glasgow', tier: 80, crowd: 1.5, aliases: [] },
+          { name: 'Cardiff', tier: 80, crowd: 1, aliases: [] },
+          { name: 'Kyiv', tier: 80, crowd: 1, aliases: ['kiev'] },
+          { name: 'Moscow', tier: 80, crowd: 0.8, aliases: [] },
+          { name: 'Amsterdam', tier: 80, crowd: 0.6, aliases: [] },
+          { name: 'Vienna', tier: 80, crowd: 0.5, aliases: ['wien'] },
+          { name: 'Brussels', tier: 80, crowd: 0.4, aliases: [] },
+          { name: 'Porto', tier: 80, crowd: 0.4, aliases: [] },
+          { name: 'Manchester', tier: 80, crowd: 0.3, aliases: [] },
+          { name: 'Rotterdam', tier: 100, crowd: 0.2, aliases: [] },
+          { name: 'Seville', tier: 100, crowd: 0.2, aliases: ['sevilla'] },
+          { name: 'Stuttgart', tier: 100, crowd: 0.2, aliases: [] },
+          { name: 'Bern', tier: 100, crowd: 0.1, aliases: [] },
+          { name: 'Belgrade', tier: 100, crowd: 0.1, aliases: [] },
+          { name: 'Bari', tier: 100, crowd: 0.1, aliases: [] },
+          { name: 'Gelsenkirchen', tier: 100, crowd: 0.1, aliases: [] }
+        ]
+      },
+      {
+        id: 'ucl_stadiums',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a stadium that has hosted a UCL / European Cup Final.',
+        hint: 'From Wembley and San Siro to Puskás Aréna (2026).',
+        answers: [
+          { name: 'Wembley Stadium', tier: 10, crowd: 28, aliases: ['wembley'] },
+          { name: 'San Siro', tier: 10, crowd: 18, aliases: ['giuseppe meazza'] },
+          { name: 'Santiago Bernabéu', tier: 30, crowd: 12, aliases: ['bernabeu', 'santiago bernabeu'] },
+          { name: 'Camp Nou', tier: 30, crowd: 9, aliases: ['nou camp'] },
+          { name: 'Allianz Arena', tier: 30, crowd: 8, aliases: [] },
+          { name: 'Stade de France', tier: 55, crowd: 5, aliases: [] },
+          { name: 'Atatürk Olympic Stadium', tier: 55, crowd: 4, aliases: ['ataturk', 'ataturk stadium'] },
+          { name: 'Stadio Olimpico', tier: 55, crowd: 3, aliases: ['olimpico'] },
+          { name: 'Puskás Aréna', tier: 55, crowd: 2.5, aliases: ['puskas arena'] },
+          { name: 'Old Trafford', tier: 80, crowd: 2, aliases: [] },
+          { name: 'Parc des Princes', tier: 80, crowd: 1.5, aliases: [] },
+          { name: 'Estádio da Luz', tier: 80, crowd: 1.5, aliases: ['da luz', 'estadio da luz'] },
+          { name: 'Metropolitano Stadium', tier: 80, crowd: 1, aliases: ['metropolitano', 'wanda metropolitano'] },
+          { name: 'Hampden Park', tier: 80, crowd: 0.8, aliases: ['hampden'] },
+          { name: 'Luzhniki Stadium', tier: 80, crowd: 0.6, aliases: ['luzhniki'] },
+          { name: 'Millennium Stadium', tier: 80, crowd: 0.5, aliases: ['principality stadium'] },
+          { name: 'Estádio do Dragão', tier: 80, crowd: 0.5, aliases: ['do dragao', 'estadio do dragao'] },
+          { name: 'NSC Olimpiyskiy', tier: 80, crowd: 0.4, aliases: ['olimpiyskiy'] },
+          { name: 'Olympiastadion Berlin', tier: 80, crowd: 0.4, aliases: ['olympiastadion'] },
+          { name: 'De Kuip', tier: 100, crowd: 0.2, aliases: [] },
+          { name: 'Heysel Stadium', tier: 100, crowd: 0.2, aliases: ['heysel'] },
+          { name: 'Praterstadion', tier: 100, crowd: 0.2, aliases: ['ernst-happel-stadion', 'ernst happel'] },
+          { name: 'Ramón Sánchez Pizjuán', tier: 100, crowd: 0.1, aliases: ['sanchez pizjuan', 'ramon sanchez pizjuan'] },
+          { name: 'Arena AufSchalke', tier: 100, crowd: 0.1, aliases: ['aufschalke', 'veltins arena'] },
+          { name: 'Stadio San Nicola', tier: 100, crowd: 0.1, aliases: ['san nicola'] },
+          { name: 'Wankdorf Stadium', tier: 100, crowd: 0.1, aliases: ['wankdorf'] }
+        ]
+      },
+      {
+        id: 'ucl_nations',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a country whose clubs have won the UCL / European Cup.',
+        hint: '10 European nations have produced a champion club.',
+        answers: [
+          { name: 'Spain', tier: 10, crowd: 30, aliases: [] },
+          { name: 'England', tier: 10, crowd: 26, aliases: [] },
+          { name: 'Italy', tier: 30, crowd: 14, aliases: [] },
+          { name: 'Germany', tier: 30, crowd: 11, aliases: ['west germany'] },
+          { name: 'France', tier: 55, crowd: 8, aliases: [] },
+          { name: 'Portugal', tier: 55, crowd: 4, aliases: [] },
+          { name: 'Netherlands', tier: 80, crowd: 3, aliases: ['holland'] },
+          { name: 'Scotland', tier: 80, crowd: 2, aliases: [] },
+          { name: 'Romania', tier: 100, crowd: 1, aliases: [] },
+          { name: 'Yugoslavia', tier: 100, crowd: 1, aliases: ['serbia'] }
+        ]
+      },
+      {
+        id: 'ucl_2020s',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a club that won the UEFA Champions League in the 2020s (2020–2026).',
+        hint: 'Only 5 clubs have lifted the trophy this decade.',
+        answers: [
+          { name: 'Real Madrid', tier: 10, crowd: 36, aliases: ['real', 'madrid'] },
+          { name: 'Manchester City', tier: 30, crowd: 24, aliases: ['man city'] },
+          { name: 'Paris Saint-Germain', tier: 55, crowd: 18, aliases: ['psg', 'paris'] },
+          { name: 'Chelsea', tier: 80, crowd: 13, aliases: [] },
+          { name: 'Bayern Munich', tier: 100, crowd: 9, aliases: ['bayern'] }
+        ]
+      },
+      {
+        id: 'ucl_1980s',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a club that won the European Cup in the 1980s (1980–1989).',
+        hint: '9 clubs across an iconic decade of underdogs and giants.',
+        answers: [
+          { name: 'Liverpool', tier: 10, crowd: 28, aliases: [] },
+          { name: 'AC Milan', tier: 30, crowd: 20, aliases: ['milan'] },
+          { name: 'Juventus', tier: 30, crowd: 14, aliases: ['juve'] },
+          { name: 'Nottingham Forest', tier: 55, crowd: 12, aliases: ['forest'] },
+          { name: 'Aston Villa', tier: 55, crowd: 10, aliases: ['villa'] },
+          { name: 'Porto', tier: 80, crowd: 7, aliases: ['fc porto'] },
+          { name: 'PSV Eindhoven', tier: 80, crowd: 4, aliases: ['psv'] },
+          { name: 'Hamburger SV', tier: 100, crowd: 3, aliases: ['hamburg', 'hsv'] },
+          { name: 'Steaua București', tier: 100, crowd: 2, aliases: ['steaua', 'steaua bucharest', 'fcsb'] }
+        ]
+      },
+      {
+        id: 'ucl_1990s',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a club that won the European Cup / UCL in the 1990s (1990–1999).',
+        hint: '9 clubs, ending with Man Utd\'s 1999 treble.',
+        answers: [
+          { name: 'Manchester United', tier: 10, crowd: 26, aliases: ['man utd', 'man united'] },
+          { name: 'Real Madrid', tier: 10, crowd: 22, aliases: ['real', 'madrid'] },
+          { name: 'Barcelona', tier: 30, crowd: 15, aliases: ['barca'] },
+          { name: 'AC Milan', tier: 30, crowd: 12, aliases: ['milan'] },
+          { name: 'Ajax', tier: 55, crowd: 9, aliases: [] },
+          { name: 'Juventus', tier: 55, crowd: 7, aliases: ['juve'] },
+          { name: 'Borussia Dortmund', tier: 80, crowd: 5, aliases: ['dortmund', 'bvb'] },
+          { name: 'Marseille', tier: 80, crowd: 2.5, aliases: ['om'] },
+          { name: 'Red Star Belgrade', tier: 100, crowd: 1.5, aliases: ['red star', 'crvena zvezda'] }
+        ]
+      },
+      {
+        id: 'ucl_penalties',
+        pack: 'ucl',
+        category: 'UEFA Champions League',
+        question: 'Name a club that won a UCL / European Cup Final on a penalty shoot-out.',
+        hint: '11 clubs, including PSG in 2026 and Chelsea in 2012.',
+        answers: [
+          { name: 'Chelsea', tier: 10, crowd: 24, aliases: [] },
+          { name: 'Liverpool', tier: 10, crowd: 22, aliases: [] },
+          { name: 'Real Madrid', tier: 30, crowd: 16, aliases: ['real', 'madrid'] },
+          { name: 'Manchester United', tier: 30, crowd: 12, aliases: ['man utd', 'man united'] },
+          { name: 'Paris Saint-Germain', tier: 55, crowd: 9, aliases: ['psg', 'paris'] },
+          { name: 'AC Milan', tier: 55, crowd: 6, aliases: ['milan'] },
+          { name: 'Bayern Munich', tier: 80, crowd: 4, aliases: ['bayern'] },
+          { name: 'Juventus', tier: 80, crowd: 3, aliases: ['juve'] },
+          { name: 'PSV Eindhoven', tier: 80, crowd: 2, aliases: ['psv'] },
+          { name: 'Steaua București', tier: 100, crowd: 1, aliases: ['steaua', 'steaua bucharest', 'fcsb'] },
+          { name: 'Red Star Belgrade', tier: 100, crowd: 1, aliases: ['red star', 'crvena zvezda'] }
+        ]
+      },
+      {
+        id: 'euro_winners',
+        pack: 'awards',
+        category: 'UEFA Euros',
+        question: 'Name a country that has won the UEFA European Championship (Euros, 1960–2024).',
+        hint: '10 countries, from Soviet Union (1960) to Spain (2024).',
+        answers: [
+          { name: 'Spain', tier: 10, crowd: 28, aliases: [] },
+          { name: 'Germany', tier: 10, crowd: 20, aliases: ['west germany'] },
+          { name: 'Italy', tier: 30, crowd: 15, aliases: [] },
+          { name: 'France', tier: 30, crowd: 14, aliases: [] },
+          { name: 'Portugal', tier: 55, crowd: 9, aliases: [] },
+          { name: 'Netherlands', tier: 55, crowd: 6, aliases: ['holland'] },
+          { name: 'Greece', tier: 80, crowd: 4, aliases: [] },
+          { name: 'Denmark', tier: 80, crowd: 2, aliases: [] },
+          { name: 'Soviet Union', tier: 100, crowd: 1, aliases: ['ussr'] },
+          { name: 'Czechoslovakia', tier: 100, crowd: 1, aliases: [] }
+        ]
+      },
+      {
+        id: 'ballon_2000s',
+        pack: 'awards',
+        category: 'Ballon d\'Or',
+        question: 'Name a Men\'s Ballon d\'Or winner since 2000 (2000–2026).',
+        hint: '15 players, including Ousmane Dembélé (2025) and Harry Kane (2026).',
+        answers: [
+          { name: 'Lionel Messi', tier: 10, crowd: 32, aliases: ['messi'] },
+          { name: 'Cristiano Ronaldo', tier: 10, crowd: 24, aliases: ['ronaldo', 'cr7'] },
+          { name: 'Harry Kane', tier: 30, crowd: 10, aliases: ['kane'] },
+          { name: 'Rodri', tier: 30, crowd: 8, aliases: [] },
+          { name: 'Luka Modrić', tier: 30, crowd: 6, aliases: ['modric', 'luka modric'] },
+          { name: 'Karim Benzema', tier: 55, crowd: 5, aliases: ['benzema'] },
+          { name: 'Ousmane Dembélé', tier: 55, crowd: 4, aliases: ['dembele', 'ousmane dembele'] },
+          { name: 'Ronaldinho', tier: 55, crowd: 3.5, aliases: [] },
+          { name: 'Kaká', tier: 80, crowd: 2.5, aliases: ['kaka'] },
+          { name: 'Ronaldo Nazário', tier: 80, crowd: 1.5, aliases: ['r9', 'ronaldo nazario'] },
+          { name: 'Michael Owen', tier: 80, crowd: 1, aliases: ['owen'] },
+          { name: 'Fabio Cannavaro', tier: 80, crowd: 1, aliases: ['cannavaro'] },
+          { name: 'Luís Figo', tier: 80, crowd: 0.7, aliases: ['figo', 'luis figo'] },
+          { name: 'Andriy Shevchenko', tier: 100, crowd: 0.4, aliases: ['shevchenko'] },
+          { name: 'Pavel Nedvěd', tier: 100, crowd: 0.4, aliases: ['nedved', 'pavel nedved'] }
+        ]
+      },
+      {
+        id: 'ballon_british',
+        pack: 'awards',
+        category: 'Ballon d\'Or',
+        question: 'Name an English, Scottish, or Northern Irish Men\'s Ballon d\'Or winner.',
+        hint: '7 British Isles legends from 1956 to 2026.',
+        answers: [
+          { name: 'Harry Kane', tier: 10, crowd: 36, aliases: ['kane'] },
+          { name: 'Michael Owen', tier: 30, crowd: 24, aliases: ['owen'] },
+          { name: 'Bobby Charlton', tier: 55, crowd: 16, aliases: ['charlton', 'sir bobby charlton'] },
+          { name: 'George Best', tier: 55, crowd: 12, aliases: ['best'] },
+          { name: 'Kevin Keegan', tier: 80, crowd: 6, aliases: ['keegan'] },
+          { name: 'Stanley Matthews', tier: 80, crowd: 4, aliases: ['matthews', 'sir stanley matthews'] },
+          { name: 'Denis Law', tier: 100, crowd: 2, aliases: ['law'] }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 2. SOUND SYNTHESIS (Web Audio API)
+    // =========================================================================
+    const SoundFX = (() => {
+      let ctx = null;
+      let muted = false;
+
+      function ensureCtx() {
+        if (muted) return null;
+        if (!ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) ctx = new AudioCtx();
+        }
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+        return ctx;
+      }
+
+      function playTone(freq, duration, type = 'sine', gainVal = 0.08, delay = 0) {
+        const c = ensureCtx();
+        if (!c) return;
+        const now = c.currentTime + delay;
+        const osc = c.createOscillator();
+        const gain = c.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(gainVal, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        osc.connect(gain);
+        gain.connect(c.destination);
+        osc.start(now);
+        osc.stop(now + duration + 0.02);
+      }
+
+      return {
+        setMuted(val) { muted = val; },
+        isMuted() { return muted; },
+        tick() { playTone(720, 0.06, 'triangle', 0.04); },
+        kick() { playTone(120, 0.09, 'sine', 0.14, 0); },
+        goal(tier) {
+          this.kick();
+          const base = 340 + tier * 3.2;
+          playTone(base, 0.16, 'sine', 0.09, 0.12);
+          playTone(base * 1.25, 0.24, 'triangle', 0.08, 0.2);
+          if (tier >= 85) playTone(base * 1.5, 0.35, 'sine', 0.1, 0.28);
+        },
+        save() {
+          this.kick();
+          playTone(175, 0.18, 'sawtooth', 0.05, 0.14);
+          playTone(130, 0.24, 'sawtooth', 0.05, 0.22);
+        },
+        finish() {
+          [440, 554.37, 659.25, 880].forEach((f, i) => playTone(f, 0.25, 'triangle', 0.07, i * 0.09));
+        }
+      };
+    })();
+
+    // =========================================================================
+    // 3. FUZZY MATCHING & NORMALIZATION
+    // =========================================================================
+    function normalizeText(str) {
+      return (str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function levenshtein(a, b) {
+      const m = a.length, n = b.length;
+      if (m === 0) return n;
+      if (n === 0) return m;
+      const dp = Array.from({ length: m + 1 }, (_, i) => [i]);
+      for (let j = 1; j <= n; j++) dp[0][j] = j;
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+        }
+      }
+      return dp[m][n];
+    }
+
+    function matchAnswer(prompt, rawInput) {
+      const norm = normalizeText(rawInput);
+      if (!norm) return null;
+
+      for (const ans of prompt.answers) {
+        const candidates = [ans.name, ...(ans.aliases || [])].map(normalizeText);
+        if (candidates.includes(norm)) return ans;
+      }
+
+      let best = null;
+      let bestDist = 99;
+      for (const ans of prompt.answers) {
+        const candidates = [ans.name, ...(ans.aliases || [])].map(normalizeText);
+        for (const c of candidates) {
+          const maxDist = c.length >= 8 ? 2 : (c.length >= 5 ? 1 : 0);
+          if (maxDist === 0) continue;
+          const d = levenshtein(norm, c);
+          if (d <= maxDist && d < bestDist) {
+            bestDist = d;
+            best = ans;
+          }
+        }
+      }
+      return best;
+    }
+
+    // =========================================================================
+    // 4. STATE & STORAGE
+    // =========================================================================
+    const STORAGE_KEY = 'goalianaire_stats_v1';
+    function getTodayKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function loadStats() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return { streak: 0, bestScore: 0, lastDailyDate: null, dailyCompleted: {} };
+    }
+
+    function saveStats(stats) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+      } catch (e) {}
+    }
+
+    function seededRandom(seedStr) {
+      let h = 2166136261 >>> 0;
+      for (let i = 0; i < seedStr.length; i++) {
+        h ^= seedStr.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return function() {
+        h += 0x6D2B79F5;
+        let t = Math.imul(h ^ (h >>> 15), 1 | h);
+        t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function pickPrompts(mode, pack) {
+      let pool = pack === 'all' ? [...PROMPTS] : PROMPTS.filter(p => p.pack === pack);
+      if (pool.length < 7) {
+        const extras = PROMPTS.filter(p => p.pack !== pack);
+        pool = [...pool, ...extras];
+      }
+      const rng = mode === 'daily' ? seededRandom('goalianaire-' + getTodayKey()) : Math.random;
+      const arr = [...pool];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      if (pack !== 'all') {
+        arr.sort((a, b) => (a.pack === pack ? -1 : 1) - (b.pack === pack ? -1 : 1));
+      }
+      return arr.slice(0, 7);
+    }
+
+    const state = {
+      mode: 'daily',
+      pack: 'all',
+      untimed: false,
+      phase: 'home',
+      roundPrompts: [],
+      currentIndex: 0,
+      timeLeft: 25.0,
+      timerHandle: null,
+      lastTickSec: 25,
+      results: [],
+      totalScore: 0
+    };
+
+    // =========================================================================
+    // 5. ANIMATED PENALTY KICK CANVAS
+    // =========================================================================
+    const canvas = document.getElementById('pitchCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const kickAnim = {
+      active: false,
+      progress: 0, // 0..1
+      tier: 0,
+      keeperDir: 1, // -1 left, 1 right
+      bannerText: '',
+      bannerAlpha: 0,
+      sparks: []
+    };
+
+    function triggerKickAnimation(tier) {
+      kickAnim.active = true;
+      kickAnim.progress = 0;
+      kickAnim.tier = tier;
+      // Keeper dives opposite of corners, or toward ball on save
+      if (tier === 0) kickAnim.keeperDir = 1;
+      else if (tier === 25) kickAnim.keeperDir = -1; // ball goes bottom-right, keeper dives left
+      else if (tier === 45) kickAnim.keeperDir = 1;  // ball goes mid-left, keeper dives right
+      else if (tier === 100) kickAnim.keeperDir = -1; // ball goes top-right bins, keeper dives left
+      else kickAnim.keeperDir = Math.random() < 0.5 ? -1 : 1;
+
+      kickAnim.bannerText = TIER_META[tier].label.toUpperCase();
+      kickAnim.bannerAlpha = 1;
+      kickAnim.sparks = [];
+    }
+
+    function resetKickGraphic() {
+      kickAnim.active = false;
+      kickAnim.progress = 0;
+      kickAnim.tier = 0;
+      kickAnim.bannerAlpha = 0;
+      kickAnim.sparks = [];
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.max(100, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(100, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function getShotTarget(tier, gx, gy, gw, gh) {
+      // Returns { tx, ty, arcHeight, bounceBar }
+      switch (tier) {
+        case 100: // Top Bins (top-right corner)
+          return { tx: gx + gw * 0.91, ty: gy + gh * 0.14, arc: 22, bounceBar: false };
+        case 85: // Off the Bar & In
+          return { tx: gx + gw * 0.24, ty: gy + gh * 0.55, barX: gx + gw * 0.24, barY: gy + 5, arc: 18, bounceBar: true };
+        case 65: // Panenka (chipped center)
+          return { tx: gx + gw * 0.50, ty: gy + gh * 0.36, arc: 62, bounceBar: false };
+        case 45: // Side Netting (mid-left)
+          return { tx: gx + gw * 0.08, ty: gy + gh * 0.48, arc: 18, bounceBar: false };
+        case 25: // Low Corner (bottom-right)
+          return { tx: gx + gw * 0.88, ty: gy + gh * 0.86, arc: 8, bounceBar: false };
+        case 10: // Down the Middle
+          return { tx: gx + gw * 0.50, ty: gy + gh * 0.72, arc: 8, bounceBar: false };
+        default: // 0: Saved by Keeper (right-center)
+          return { tx: gx + gw * 0.72, ty: gy + gh * 0.52, arc: 12, bounceBar: false };
+      }
+    }
+
+    function drawPitchCanvas() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      if (!w || !h) {
+        requestAnimationFrame(drawPitchCanvas);
+        return;
+      }
+
+      // Advance kick animation
+      if (kickAnim.active && kickAnim.progress < 1) {
+        kickAnim.progress = Math.min(1, kickAnim.progress + 0.032);
+        if (kickAnim.progress >= 0.78 && kickAnim.sparks.length === 0 && kickAnim.tier >= 65) {
+          const goalW = w * 0.64;
+          const goalH = h * 0.36;
+          const goalX = (w - goalW) / 2;
+          const goalY = h * 0.18;
+          const tgt = getShotTarget(kickAnim.tier, goalX, goalY, goalW, goalH);
+          for (let i = 0; i < 16; i++) {
+            const ang = Math.random() * Math.PI * 2;
+            const spd = 1.2 + Math.random() * 2.8;
+            kickAnim.sparks.push({
+              x: tgt.tx, y: tgt.ty,
+              vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+              life: 1
+            });
+          }
+        }
+      }
+
+      // 1. Night Stadium Sky
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.45);
+      skyGrad.addColorStop(0, '#020b12');
+      skyGrad.addColorStop(1, '#072226');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h * 0.45);
+
+      // Floodlights
+      [[w * 0.16, h * 0.08], [w * 0.84, h * 0.08]].forEach(([fx, fy]) => {
+        const fl = ctx.createRadialGradient(fx, fy, 2, fx, fy, w * 0.25);
+        fl.addColorStop(0, 'rgba(209, 250, 229, 0.35)');
+        fl.addColorStop(1, 'rgba(16, 185, 129, 0)');
+        ctx.fillStyle = fl;
+        ctx.beginPath();
+        ctx.arc(fx, fy, w * 0.25, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 2. Pitch Turf (from y = h*0.42 to bottom)
+      const turfTop = h * 0.42;
+      const turfGrad = ctx.createLinearGradient(0, turfTop, 0, h);
+      turfGrad.addColorStop(0, '#065f46');
+      turfGrad.addColorStop(1, '#064e3b');
+      ctx.fillStyle = turfGrad;
+      ctx.fillRect(0, turfTop, w, h - turfTop);
+
+      // Perspective Pitch Stripes
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.11)';
+      for (let i = 0; i < 4; i++) {
+        const y1 = turfTop + (h - turfTop) * (i / 4);
+        const y2 = turfTop + (h - turfTop) * ((i + 0.5) / 4);
+        ctx.fillRect(0, y1, w, y2 - y1);
+      }
+
+      // Penalty Box Markings
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.08, turfTop + (h - turfTop) * 0.45);
+      ctx.lineTo(w * 0.16, turfTop + 4);
+      ctx.lineTo(w * 0.84, turfTop + 4);
+      ctx.lineTo(w * 0.92, turfTop + (h - turfTop) * 0.45);
+      ctx.stroke();
+
+      // Penalty Spot
+      const spotX = w * 0.5;
+      const spotY = h * 0.84;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.beginPath();
+      ctx.ellipse(spotX, spotY, 5, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Goal Frame & Net
+      const goalW = w * 0.64;
+      const goalH = h * 0.34;
+      const goalX = (w - goalW) / 2;
+      const goalY = turfTop - goalH + 8;
+
+      // Net background
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+      ctx.fillRect(goalX, goalY, goalW, goalH);
+
+      // Net mesh
+      ctx.strokeStyle = 'rgba(226, 232, 240, 0.18)';
+      ctx.lineWidth = 1;
+      const cols = 14, rows = 7;
+      for (let c = 1; c < cols; c++) {
+        const nx = goalX + (goalW * c) / cols;
+        ctx.beginPath();
+        ctx.moveTo(nx, goalY);
+        ctx.lineTo(nx, goalY + goalH);
+        ctx.stroke();
+      }
+      for (let r = 1; r < rows; r++) {
+        const ny = goalY + (goalH * r) / rows;
+        ctx.beginPath();
+        ctx.moveTo(goalX, ny);
+        ctx.lineTo(goalX + goalW, ny);
+        ctx.stroke();
+      }
+
+      // Highlight Top Bins corner subtly
+      ctx.fillStyle = 'rgba(52, 211, 153, 0.12)';
+      ctx.fillRect(goalX + goalW * 0.8, goalY, goalW * 0.2, goalH * 0.35);
+
+      // Goalposts & Crossbar
+      ctx.strokeStyle = '#f8fafc';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(goalX, goalY + goalH);
+      ctx.lineTo(goalX, goalY);
+      ctx.lineTo(goalX + goalW, goalY);
+      ctx.lineTo(goalX + goalW, goalY + goalH);
+      ctx.stroke();
+
+      // 4. Goalkeeper
+      const t = kickAnim.active ? Math.min(1, kickAnim.progress * 1.25) : 0;
+      const diveDist = kickAnim.active ? kickAnim.keeperDir * (goalW * 0.25) * Math.sin(t * Math.PI * 0.5) : 0;
+      const diveDrop = kickAnim.active ? 10 * Math.sin(t * Math.PI * 0.5) : 0;
+      const gkX = w * 0.5 + diveDist;
+      const gkY = goalY + goalH - 18 + diveDrop;
+      const gkTilt = kickAnim.active ? kickAnim.keeperDir * 0.65 * Math.sin(t * Math.PI * 0.5) : 0;
+
+      ctx.save();
+      ctx.translate(gkX, gkY);
+      ctx.rotate(gkTilt);
+      // Jersey
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(-9, -16, 18, 20);
+      // Shorts
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(-8, 4, 16, 10);
+      // Head
+      ctx.fillStyle = '#fde68a';
+      ctx.beginPath();
+      ctx.arc(0, -22, 6, 0, Math.PI * 2);
+      ctx.fill();
+      // Arms & Gloves
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(-9, -12);
+      ctx.lineTo(-20, -20);
+      ctx.moveTo(9, -12);
+      ctx.lineTo(20, -20);
+      ctx.stroke();
+      ctx.fillStyle = '#34d399';
+      ctx.beginPath();
+      ctx.arc(-21, -21, 4, 0, Math.PI * 2);
+      ctx.arc(21, -21, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // 5. Football & Shot Trail
+      const tgt = getShotTarget(kickAnim.tier, goalX, goalY, goalW, goalH);
+      let bx = spotX, by = spotY, bScale = 1;
+
+      if (kickAnim.active) {
+        const p = kickAnim.progress;
+        const ease = 1 - Math.pow(1 - p, 2.2);
+        if (tgt.bounceBar) {
+          if (p < 0.6) {
+            const p1 = p / 0.6;
+            bx = spotX + (tgt.barX - spotX) * p1;
+            by = spotY + (tgt.barY - spotY) * p1 - Math.sin(p1 * Math.PI) * tgt.arc;
+            bScale = 1 - 0.35 * p1;
+          } else {
+            const p2 = (p - 0.6) / 0.4;
+            bx = tgt.barX + (tgt.tx - tgt.barX) * p2;
+            by = tgt.barY + (tgt.ty - tgt.barY) * p2;
+            bScale = 0.65;
+          }
+        } else {
+          bx = spotX + (tgt.tx - spotX) * ease;
+          by = spotY + (tgt.ty - spotY) * ease - Math.sin(p * Math.PI) * tgt.arc;
+          bScale = 1 - 0.36 * ease;
+        }
+
+        // Shot Trail
+        ctx.strokeStyle = kickAnim.tier === 0 ? 'rgba(248, 113, 113, 0.4)' : (kickAnim.tier >= 85 ? 'rgba(52, 211, 153, 0.7)' : 'rgba(255, 255, 255, 0.4)');
+        ctx.lineWidth = kickAnim.tier >= 85 ? 4 : 2.5;
+        ctx.beginPath();
+        ctx.moveTo(spotX, spotY);
+        ctx.lineTo(bx, by);
+        ctx.stroke();
+      }
+
+      // Draw Ball Shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+      ctx.beginPath();
+      ctx.ellipse(bx, by + 10 * bScale, 9 * bScale, 3.5 * bScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw Ball
+      const r = 10 * bScale;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(bx, by, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Ball pentagon
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const ang = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+        const px = bx + Math.cos(ang) * (r * 0.44);
+        const py = by + Math.sin(ang) * (r * 0.44);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      // Sparks for Panenka / Woodwork / Top Bins
+      for (let i = kickAnim.sparks.length - 1; i >= 0; i--) {
+        const s = kickAnim.sparks[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.life -= 0.03;
+        if (s.life <= 0) {
+          kickAnim.sparks.splice(i, 1);
+          continue;
+        }
+        ctx.fillStyle = `rgba(110, 231, 183, ${s.life})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Result Callout Banner on Canvas
+      if (kickAnim.active && kickAnim.progress > 0.72 && kickAnim.bannerText) {
+        ctx.font = '800 13px "Inter", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = kickAnim.tier === 0 ? '#fca5a5' : '#6ee7b7';
+        ctx.fillText(kickAnim.bannerText, w / 2, goalY - 12);
+      }
+
+      requestAnimationFrame(drawPitchCanvas);
+    }
+
+    // =========================================================================
+    // 6. UI CONTROLLERS
+    // =========================================================================
+    const el = id => document.getElementById(id);
+
+    function showToast(msg) {
+      const t = el('toast');
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.add('hidden'), 2400);
+    }
+
+    function setView(view) {
+      state.phase = view;
+      ['homeView', 'playView', 'revealView', 'summaryView'].forEach(v => {
+        el(v).classList.toggle('hidden', v !== view + 'View');
+      });
+    }
+
+    function updateScoreboard(lastLabel = 'On the Spot') {
+      el('scoreReadout').textContent = state.totalScore.toLocaleString();
+      el('lastShotReadout').textContent = lastLabel;
+      const goals = state.results.filter(r => r.points > 0).length;
+      el('goalsCountReadout').textContent = `${goals} / 7`;
+    }
+
+    function refreshHomeStats() {
+      const stats = loadStats();
+      const today = getTodayKey();
+      el('dailyDateLabel').textContent = today;
+      el('streakVal').textContent = stats.streak || 0;
+      el('bestScoreVal').textContent = `${(stats.bestScore || 0).toLocaleString()} pts`;
+      const done = Boolean(stats.dailyCompleted && stats.dailyCompleted[today]);
+      el('dailyCompletedBadge').classList.toggle('hidden', !done);
+      el('startDailyBtn').textContent = done ? 'Replay Daily Shootout' : 'Start Daily Shootout';
+    }
+
+    function clearTimer() {
+      if (state.timerHandle) {
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+      }
+    }
+
+    function startRound(mode, pack = 'all') {
+      clearTimer();
+      resetKickGraphic();
+      state.mode = mode;
+      state.pack = pack;
+      state.untimed = mode === 'unlimited' && el('untimedToggle').checked;
+      state.roundPrompts = pickPrompts(mode, pack);
+      state.currentIndex = 0;
+      state.results = [];
+      state.totalScore = 0;
+      updateScoreboard('On the Spot');
+      el('shotBannerHint').textContent = 'Type & Shoot to take your kick';
+      loadPrompt();
+    }
+
+    function renderPromptDots() {
+      const container = el('promptDots');
+      container.innerHTML = '';
+      for (let i = 0; i < 7; i++) {
+        const dot = document.createElement('div');
+        let cls = 'h-1.5 flex-1 rounded-full transition-all ';
+        if (i < state.results.length) {
+          cls += state.results[i].points > 0 ? 'bg-emerald-400' : 'bg-rose-500/70';
+        } else if (i === state.currentIndex) {
+          cls += 'bg-white';
+        } else {
+          cls += 'bg-slate-800';
+        }
+        dot.className = cls;
+        container.appendChild(dot);
+      }
+    }
+
+    function loadPrompt() {
+      clearTimer();
+      resetKickGraphic();
+      const p = state.roundPrompts[state.currentIndex];
+      setView('play');
+      renderPromptDots();
+
+      const packNames = {
+        all: 'Unlimited · Mixed',
+        worldcup: 'World Cup Pack',
+        ucl: 'Champions League Pack',
+        awards: 'Euros & Ballon d\'Or'
+      };
+      el('modeBadge').textContent = state.mode === 'daily' ? 'Daily Shootout' : packNames[state.pack];
+      el('progressBadge').textContent = `Kick ${state.currentIndex + 1} / 7`;
+      el('categoryTag').textContent = p.category;
+      el('promptQuestion').textContent = p.question;
+      el('promptHint').textContent = p.hint;
+      el('answerInput').value = '';
+
+      if (state.untimed) {
+        el('timerText').textContent = 'Untimed';
+        el('timerText').className = 'text-sm font-mono-num font-bold text-emerald-300';
+        el('timerBar').style.width = '100%';
+        el('timerBar').className = 'h-full bg-emerald-400';
+      } else {
+        state.timeLeft = 25.0;
+        state.lastTickSec = 25;
+        el('timerText').textContent = '25.0s';
+        el('timerText').className = 'text-sm font-mono-num font-bold text-emerald-300';
+        el('timerBar').style.width = '100%';
+        el('timerBar').className = 'h-full bg-gradient-to-r from-emerald-400 to-teal-300';
+
+        const startTs = performance.now();
+        state.timerHandle = setInterval(() => {
+          const elapsed = (performance.now() - startTs) / 1000;
+          state.timeLeft = Math.max(0, 25.0 - elapsed);
+          el('timerText').textContent = `${state.timeLeft.toFixed(1)}s`;
+          el('timerBar').style.width = `${(state.timeLeft / 25.0) * 100}%`;
+
+          const secCeil = Math.ceil(state.timeLeft);
+          if (state.timeLeft <= 6 && secCeil < state.lastTickSec && secCeil > 0) {
+            state.lastTickSec = secCeil;
+            SoundFX.tick();
+          }
+          if (state.timeLeft <= 6) {
+            el('timerText').className = 'text-sm font-mono-num font-bold text-rose-400';
+            el('timerBar').className = 'h-full bg-rose-500';
+          }
+          if (state.timeLeft <= 0) {
+            clearTimer();
+            resolvePrompt('', 'timeout');
+          }
+        }, 60);
+      }
+
+      setTimeout(() => el('answerInput').focus(), 40);
+    }
+
+    function resolvePrompt(rawInput, forcedStatus = null) {
+      if (state.phase !== 'play') return;
+      clearTimer();
+
+      const p = state.roundPrompts[state.currentIndex];
+      let matched = null;
+      let status = forcedStatus;
+
+      if (!status) {
+        matched = matchAnswer(p, rawInput);
+        status = matched ? 'hit' : 'miss';
+      }
+
+      const tier = matched ? matched.tier : 0;
+      const meta = TIER_META[tier];
+      state.totalScore += meta.pts;
+
+      triggerKickAnimation(tier);
+      if (status === 'hit') SoundFX.goal(tier);
+      else SoundFX.save();
+
+      state.results.push({
+        promptId: p.id,
+        question: p.question,
+        userAnswer: rawInput.trim() || (status === 'timeout' ? 'Time Up' : 'Skipped'),
+        matchedCanonical: matched ? matched.name : null,
+        tier,
+        points: meta.pts,
+        status
+      });
+
+      updateScoreboard(meta.label);
+      el('shotBannerHint').textContent = meta.desc;
+      showReveal(p, state.results[state.results.length - 1]);
+    }
+
+    function showReveal(prompt, res) {
+      setView('reveal');
+      const meta = TIER_META[res.tier];
+      el('revealProgress').textContent = `Kick ${state.currentIndex + 1} / 7`;
+      el('revealScorePill').textContent = `Score: ${state.totalScore.toLocaleString()} pts`;
+
+      const banner = el('outcomeBanner');
+      banner.className = `rounded-xl p-4 border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${meta.cls}`;
+      el('outcomeTierBadge').className = `text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md border ${meta.cls}`;
+      el('outcomeTierBadge').textContent = meta.label;
+
+      if (res.status === 'hit') {
+        el('outcomeStatusText').textContent = res.userAnswer.toLowerCase() !== res.matchedCanonical.toLowerCase()
+          ? `Matched: ${res.matchedCanonical}`
+          : meta.desc;
+        el('outcomeAnswer').textContent = res.matchedCanonical;
+        el('outcomePoints').textContent = `+${res.points} pts`;
+        el('outcomeSub').textContent = 'GOAL!';
+      } else {
+        el('outcomeStatusText').textContent = res.status === 'timeout' ? 'Ran out of time' : 'Saved by the keeper';
+        el('outcomeAnswer').textContent = res.userAnswer;
+        el('outcomePoints').textContent = '+0 pts';
+        el('outcomeSub').textContent = 'NO GOAL';
+      }
+
+      const sorted = [...prompt.answers].sort((a, b) => b.tier - a.tier);
+      el('catchCount').textContent = `${sorted.length} valid answers`;
+      const list = el('catchList');
+      list.innerHTML = '';
+
+      for (const ans of sorted) {
+        const isPick = res.matchedCanonical === ans.name;
+        const tMeta = TIER_META[ans.tier];
+        const card = document.createElement('div');
+        card.className = `px-3 py-2 rounded-lg border flex items-center justify-between gap-2 text-xs ${
+          isPick
+            ? 'bg-emerald-500/20 border-emerald-300 ring-1 ring-emerald-300/60 text-white'
+            : 'bg-slate-900/65 border-slate-800 text-slate-200'
+        }`;
+        card.innerHTML = `
+          <div class="min-w-0">
+            <div class="font-bold truncate">${ans.name} ${isPick ? '<span class="text-emerald-300 ml-1">(You)</span>' : ''}</div>
+            <div class="text-[10px] text-slate-400">~${ans.crowd}% crowd pick</div>
+          </div>
+          <span class="shrink-0 px-2 py-0.5 rounded border text-[10px] font-bold ${tMeta.cls}">${tMeta.pts} pts</span>
+        `;
+        list.appendChild(card);
+      }
+
+      el('nextPromptBtn').textContent = state.currentIndex < 6 ? 'Next Kick →' : 'See Final Score →';
+    }
+
+    function showSummary() {
+      setView('summary');
+      SoundFX.finish();
+
+      if (state.mode === 'daily') {
+        const stats = loadStats();
+        const today = getTodayKey();
+        if (!stats.dailyCompleted) stats.dailyCompleted = {};
+        if (!stats.dailyCompleted[today]) {
+          stats.dailyCompleted[today] = state.totalScore;
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yKey = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+          stats.streak = stats.lastDailyDate === yKey ? (stats.streak || 0) + 1 : 1;
+          stats.lastDailyDate = today;
+        }
+        stats.bestScore = Math.max(stats.bestScore || 0, state.totalScore);
+        saveStats(stats);
+        refreshHomeStats();
+      }
+
+      el('summaryModeLabel').textContent = `Daily Shootout · ${getTodayKey()}`;
+      el('summaryScore').textContent = `${state.totalScore.toLocaleString()}`;
+
+      let rank = 'Sunday League Sub';
+      if (state.totalScore >= 600) rank = '🏆 Certified Goalianaire — Top Bins Maestro';
+      else if (state.totalScore >= 450) rank = '⭐ World Cup Golden Boot Finisher';
+      else if (state.totalScore >= 300) rank = '🔵 Clinical Penalty Taker';
+      else if (state.totalScore >= 150) rank = '🟢 Squad Penalty Specialist';
+      el('summaryRank').textContent = rank;
+
+      const list = el('summaryList');
+      list.innerHTML = '';
+      state.results.forEach((r, idx) => {
+        const meta = TIER_META[r.tier];
+        const row = document.createElement('div');
+        row.className = 'p-3 rounded-xl bg-slate-900/70 border border-slate-800 flex items-center justify-between gap-3';
+        row.innerHTML = `
+          <div class="min-w-0">
+            <div class="text-[11px] text-slate-400 truncate">${idx + 1}. ${r.question}</div>
+            <div class="text-sm font-bold text-white mt-0.5">${r.matchedCanonical || r.userAnswer}</div>
+          </div>
+          <div class="shrink-0 text-right">
+            <span class="inline-block px-2 py-0.5 rounded border text-[10px] font-bold ${meta.cls}">${meta.label}</span>
+            <div class="text-xs font-mono-num font-bold text-emerald-300 mt-0.5">+${r.points} pts</div>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function copyShareText() {
+      const emojis = state.results.map(r => TIER_META[r.tier].emoji).join('');
+      const label = `Daily Shootout (${getTodayKey()})`;
+      const text = `⚽ GOALIANAIRE — ${label}\nScore: ${state.totalScore.toLocaleString()} / 700 pts\n${emojis}`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast('Result copied to clipboard!'))
+          .catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('Result copied to clipboard!');
+      } catch (e) {
+        showToast('Could not copy automatically.');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // =========================================================================
+    // 7. EVENT LISTENERS & INIT
+    // =========================================================================
+    window.addEventListener('load', () => {
+      resizeCanvas();
+      refreshHomeStats();
+      drawPitchCanvas();
+    });
+    window.addEventListener('resize', resizeCanvas);
+
+    el('brandBtn').addEventListener('click', () => {
+      clearTimer();
+      resetKickGraphic();
+      setView('home');
+    });
+
+    el('startDailyBtn').addEventListener('click', () => startRound('daily', 'all'));
+
+    document.querySelectorAll('.pack-btn').forEach(btn => {
+      btn.addEventListener('click', () => startRound('unlimited', btn.dataset.pack));
+    });
+
+    el('answerForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const val = el('answerInput').value.trim();
+      if (!val) {
+        showToast('Type an answer or click Skip');
+        return;
+      }
+      resolvePrompt(val);
+    });
+
+    el('skipBtn').addEventListener('click', () => resolvePrompt('', 'miss'));
+
+    el('nextPromptBtn').addEventListener('click', () => {
+      if (state.currentIndex < 6) {
+        state.currentIndex += 1;
+        loadPrompt();
+      } else {
+        showSummary();
+      }
+    });
+
+    el('shareBtn').addEventListener('click', copyShareText);
+    
+    el('homeBtn').addEventListener('click', () => {
+      clearTimer();
+      resetKickGraphic();
+      setView('home');
+    });
+
+    el('muteBtn').addEventListener('click', () => {
+      const next = !SoundFX.isMuted();
+      SoundFX.setMuted(next);
+      el('soundOnIcon').classList.toggle('hidden', next);
+      el('soundOffIcon').classList.toggle('hidden', !next);
+    });
+
+    el('howToBtn').addEventListener('click', () => el('rulesModal').classList.remove('hidden'));
+    el('closeRulesBtn').addEventListener('click', () => el('rulesModal').classList.add('hidden'));
+    el('gotItBtn').addEventListener('click', () => el('rulesModal').classList.add('hidden'));
+    el('rulesModal').addEventListener('click', e => {
+      if (e.target === el('rulesModal')) el('rulesModal').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>
